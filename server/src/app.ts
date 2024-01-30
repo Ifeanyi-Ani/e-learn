@@ -3,6 +3,7 @@ import cors from "cors";
 import cookieParser from "cookie-parser";
 
 import CreateErr from "./utils/CreateErr";
+import { errorHandler } from "./middleware/errorHandler";
 
 require("dotenv").config();
 
@@ -17,7 +18,7 @@ app.use(cookieParser());
 // }))
 app.use(cors());
 
-app.get("/test", (req: Request, res: Response, next: NextFunction) => {
+app.get("/test", (_req: Request, res: Response, next: NextFunction) => {
   res.json({
     hello: "worked",
   });
@@ -26,13 +27,4 @@ app.get("/test", (req: Request, res: Response, next: NextFunction) => {
 app.all("*", (req: Request, _res: Response, next: NextFunction) => {
   next(new CreateErr(404, `Route ${req.originalUrl} not found`));
 });
-app.use((err: CreateErr, _req: Request, res: Response, _next: NextFunction) => {
-  err.statusCode = err.statusCode || 500;
-  const status = err.status;
-  const message = err.message || "Something went wrong";
-
-  res.status(err.statusCode).json({
-    status,
-    message,
-  });
-});
+app.use(errorHandler);
