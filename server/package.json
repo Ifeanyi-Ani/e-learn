@@ -7,7 +7,9 @@
     "test": "jest --watchAll --no-cache",
     "test:ci": "jest",
     "dev": "ts-node-dev --respawn --transpile-only server.ts",
-    "start":"nodemon server.js"
+    "start:build": "tsc -w",
+    "start:run": "nodemon dist/src/server.js",
+    "start": "concurrently npm:start:*"
   },
   "repository": {
     "type": "git",
@@ -27,6 +29,7 @@
     "@types/jsonwebtoken": "^9.0.3",
     "@types/node": "^20.8.6",
     "bcryptjs": "^2.4.3",
+    "concurrently": "^8.2.2",
     "cookie-parser": "^1.4.6",
     "cors": "^2.8.5",
     "dotenv": "^16.3.1",
