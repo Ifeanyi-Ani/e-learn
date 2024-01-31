@@ -1,9 +1,13 @@
 import { Response, Request, NextFunction } from "express";
-import jwt from "jsonwebtoken";
+import jwt, { Secret } from "jsonwebtoken";
+import ejs from "ejs";
+
+require("dotenv").config();
 
 import userModel, { IUser } from "../models/user.models";
 import CreateErr from "../utils/CreateErr";
 import { catchAsync } from "../middleware/catchAsync";
+import path from "path";
 
 interface IRegistrationBody {
   name: string;
@@ -14,22 +18,24 @@ interface IRegistrationBody {
 
 interface ICreateActivation {
   token: string;
-  activationToken: string;
+  activationCode: string;
 }
 
-export const createActivationToken = (props: IUser): ICreateActivation => {
-  const activationToken = Math.floor(1000 + Math.random() * 9000).toString();
+export const createActivationToken = (
+  props: IRegistrationBody,
+): ICreateActivation => {
+  const activationCode = Math.floor(1000 + Math.random() * 9000).toString();
 
   const token = jwt.sign(
     {
       props,
-      activationToken,
+      activationCode,
     },
-    process.env.ACTIVATION_SECRET!,
+    process.env.ACTIVATION_SECRET as Secret,
     { expiresIn: "5m" },
   );
 
-  return { token, activationToken };
+  return { token, activationCode };
 };
 
 export const registerUser = catchAsync(
@@ -50,6 +56,11 @@ export const registerUser = catchAsync(
       };
 
       const activationToken = createActivationToken(user);
+
+      const activationCode = activationToken.activationCode;
+      const data = { user: { name: user.name }, activationCode };
+
+      const html = ejs.renderFile(path.join(__dirname, ""));
     } catch (err: any) {
       return next(new CreateErr(400, err.message));
     }

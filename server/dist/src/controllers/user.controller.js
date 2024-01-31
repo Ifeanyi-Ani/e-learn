@@ -14,16 +14,19 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.registerUser = exports.createActivationToken = void 0;
 const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
+const ejs_1 = __importDefault(require("ejs"));
+require("dotenv").config();
 const user_models_1 = __importDefault(require("../models/user.models"));
 const CreateErr_1 = __importDefault(require("../utils/CreateErr"));
 const catchAsync_1 = require("../middleware/catchAsync");
+const path_1 = __importDefault(require("path"));
 const createActivationToken = (props) => {
-    const activationToken = Math.floor(1000 + Math.random() * 9000).toString();
+    const activationCode = Math.floor(1000 + Math.random() * 9000).toString();
     const token = jsonwebtoken_1.default.sign({
         props,
-        activationToken,
+        activationCode,
     }, process.env.ACTIVATION_SECRET, { expiresIn: "5m" });
-    return { token, activationToken };
+    return { token, activationCode };
 };
 exports.createActivationToken = createActivationToken;
 exports.registerUser = (0, catchAsync_1.catchAsync)((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
@@ -39,6 +42,9 @@ exports.registerUser = (0, catchAsync_1.catchAsync)((req, res, next) => __awaite
             password,
         };
         const activationToken = (0, exports.createActivationToken)(user);
+        const activationCode = activationToken.activationCode;
+        const data = { user: { name: user.name }, activationCode };
+        const html = ejs_1.default.renderFile(path_1.default.join(__dirname, ""));
     }
     catch (err) {
         return next(new CreateErr_1.default(400, err.message));
