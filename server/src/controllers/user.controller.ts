@@ -58,9 +58,11 @@ export const registerUser = catchAsync(
       const activationToken = createActivationToken(user);
 
       const activationCode = activationToken.activationCode;
-      const data = { user: { name: user.name }, activationCode };
+      const data: any = { user: { name: user.name }, activationCode };
 
-      const html = ejs.renderFile(path.join(__dirname, ""));
+      const html = ejs.renderFile(
+        path.join(__dirname, "../mails/activation-mail.ejs", data),
+      );
     } catch (err: any) {
       return next(new CreateErr(400, err.message));
     }
