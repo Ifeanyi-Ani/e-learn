@@ -20,6 +20,7 @@ const user_models_1 = __importDefault(require("../models/user.models"));
 const CreateErr_1 = __importDefault(require("../utils/CreateErr"));
 const catchAsync_1 = require("../middleware/catchAsync");
 const path_1 = __importDefault(require("path"));
+const sendMail_1 = __importDefault(require("../utils/sendMail"));
 const createActivationToken = (props) => {
     const activationCode = Math.floor(1000 + Math.random() * 9000).toString();
     const token = jsonwebtoken_1.default.sign({
@@ -45,6 +46,17 @@ exports.registerUser = (0, catchAsync_1.catchAsync)((req, res, next) => __awaite
         const activationCode = activationToken.activationCode;
         const data = { user: { name: user.name }, activationCode };
         const html = ejs_1.default.renderFile(path_1.default.join(__dirname, "../mails/activation-mail.ejs", data));
+        yield (0, sendMail_1.default)({
+            email: user.email,
+            subject: "Activate your account",
+            templete: "activation-mail.ejs",
+            data,
+        });
+        res.status(201).json({
+            success: true,
+            message: `Please check your email: ${user.email} to activate your account`,
+            activationToken: activationToken.token,
+        });
     }
     catch (err) {
         return next(new CreateErr_1.default(400, err.message));

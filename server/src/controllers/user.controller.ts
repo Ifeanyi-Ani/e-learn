@@ -8,6 +8,7 @@ import userModel, { IUser } from "../models/user.models";
 import CreateErr from "../utils/CreateErr";
 import { catchAsync } from "../middleware/catchAsync";
 import path from "path";
+import sendMail from "../utils/sendMail";
 
 interface IRegistrationBody {
   name: string;
@@ -63,6 +64,18 @@ export const registerUser = catchAsync(
       const html = ejs.renderFile(
         path.join(__dirname, "../mails/activation-mail.ejs", data),
       );
+
+      await sendMail({
+        email: user.email,
+        subject: "Activate your account",
+        templete: "activation-mail.ejs",
+        data,
+      });
+      res.status(201).json({
+        success: true,
+        message: `Please check your email: ${user.email} to activate your account`,
+        activationToken: activationToken.token,
+      });
     } catch (err: any) {
       return next(new CreateErr(400, err.message));
     }
