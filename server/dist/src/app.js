@@ -9,6 +9,7 @@ const cors_1 = __importDefault(require("cors"));
 const cookie_parser_1 = __importDefault(require("cookie-parser"));
 const CreateErr_1 = __importDefault(require("./utils/CreateErr"));
 const errorHandler_1 = require("./middleware/errorHandler");
+const user_routes_1 = __importDefault(require("./routes/user.routes"));
 require("dotenv").config();
 exports.app = (0, express_1.default)();
 exports.app.use(express_1.default.json({ limit: "100mb" }));
@@ -18,12 +19,7 @@ exports.app.use((0, cookie_parser_1.default)());
 //     origin: process.env.ORIGIN
 // }))
 exports.app.use((0, cors_1.default)());
-exports.app.get("/test", (_req, res, next) => {
-    res.json({
-        hello: "worked",
-    });
-    next();
-});
+exports.app.use("/api/v1", user_routes_1.default);
 exports.app.all("*", (req, _res, next) => {
     next(new CreateErr_1.default(404, `Route ${req.originalUrl} not found`));
 });

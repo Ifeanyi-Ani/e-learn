@@ -1,13 +1,14 @@
+require("dotenv").config();
 import { Response, Request, NextFunction } from "express";
 import jwt, { Secret } from "jsonwebtoken";
 import ejs from "ejs";
+import path from "path";
 
 require("dotenv").config();
 
 import userModel, { IUser } from "../models/user.models";
 import CreateErr from "../utils/CreateErr";
 import { catchAsync } from "../middleware/catchAsync";
-import path from "path";
 import sendMail from "../utils/sendMail";
 
 interface IRegistrationBody {
@@ -59,10 +60,11 @@ export const registerUser = catchAsync(
       const activationToken = createActivationToken(user);
 
       const activationCode = activationToken.activationCode;
-      const data: any = { user: { name: user.name }, activationCode };
+      const data = { user: { name: user.name }, activationCode };
 
       const html = ejs.renderFile(
-        path.join(__dirname, "../mails/activation-mail.ejs", data),
+        `${process.cwd()}/mails/activation-mail.ejs`,
+        data,
       );
 
       await sendMail({

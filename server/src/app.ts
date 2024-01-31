@@ -4,6 +4,7 @@ import cookieParser from "cookie-parser";
 
 import CreateErr from "./utils/CreateErr";
 import { errorHandler } from "./middleware/errorHandler";
+import userRouter from "./routes/user.routes";
 
 require("dotenv").config();
 
@@ -18,12 +19,7 @@ app.use(cookieParser());
 // }))
 app.use(cors());
 
-app.get("/test", (_req: Request, res: Response, next: NextFunction) => {
-  res.json({
-    hello: "worked",
-  });
-  next();
-});
+app.use("/api/v1", userRouter);
 app.all("*", (req: Request, _res: Response, next: NextFunction) => {
   next(new CreateErr(404, `Route ${req.originalUrl} not found`));
 });

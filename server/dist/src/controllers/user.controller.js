@@ -13,13 +13,13 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.registerUser = exports.createActivationToken = void 0;
+require("dotenv").config();
 const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
 const ejs_1 = __importDefault(require("ejs"));
 require("dotenv").config();
 const user_models_1 = __importDefault(require("../models/user.models"));
 const CreateErr_1 = __importDefault(require("../utils/CreateErr"));
 const catchAsync_1 = require("../middleware/catchAsync");
-const path_1 = __importDefault(require("path"));
 const sendMail_1 = __importDefault(require("../utils/sendMail"));
 const createActivationToken = (props) => {
     const activationCode = Math.floor(1000 + Math.random() * 9000).toString();
@@ -45,7 +45,7 @@ exports.registerUser = (0, catchAsync_1.catchAsync)((req, res, next) => __awaite
         const activationToken = (0, exports.createActivationToken)(user);
         const activationCode = activationToken.activationCode;
         const data = { user: { name: user.name }, activationCode };
-        const html = ejs_1.default.renderFile(path_1.default.join(__dirname, "../mails/activation-mail.ejs", data));
+        const html = ejs_1.default.renderFile(`${process.cwd()}/mails/activation-mail.ejs`, data);
         yield (0, sendMail_1.default)({
             email: user.email,
             subject: "Activate your account",

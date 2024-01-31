@@ -23,8 +23,7 @@ const sendMail = async (options: EmailOptions): Promise<void> => {
 
   const { email, subject, templete, data } = options;
 
-  const templetePath = path.join(__dirname, "../mails", templete);
-  const html = await ejs.renderFile(templetePath, data);
+  const html = await ejs.renderFile(`${process.cwd()}/mails/${templete}`, data);
 
   const mailOption = {
     from: process.env.SMTP_MAIL,
@@ -32,6 +31,7 @@ const sendMail = async (options: EmailOptions): Promise<void> => {
     subject,
     html,
   };
+  await transporter.sendMail(mailOption);
 };
 
 export default sendMail;
