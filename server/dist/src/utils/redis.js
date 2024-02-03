@@ -12,4 +12,5 @@ const redisClient = () => {
         throw new Error("Redis connection failed");
     }
 };
+console.log("you");
 exports.redis = new ioredis_1.Redis(redisClient());

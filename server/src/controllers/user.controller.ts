@@ -83,3 +83,21 @@ export const registerUser = catchAsync(
     }
   },
 );
+
+export const activateUser =catchAsync(async (req:Request, res:Response, next:NextFunction) =>{
+    const {token, activationCode} = req.body as ICreateActivation;
+
+    const newUser = jwt.verify{token,process.env.ACTIVATION_SECRET as string} as {user:IUser; code:string};
+    if (newUser.code !== activationCode){
+        return next(CreateErr(400, "Invalid activation code"))
+    }
+
+    const {name,email,password} = newUser.user;
+
+    const existedUser = await userModel.findOne({email});
+    if(existedUser){
+        return  next(CreateErr(400, "user already exist"));
+    }
+
+    res.status(201).json({success: true});
+)}

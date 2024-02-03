@@ -11,4 +11,6 @@ const redisClient = () => {
   }
 };
 
+console.log("you");
+
 export const redis = new Redis(redisClient());
